@@ -36,10 +36,10 @@ def login():
 
     if request.method == "POST":
         if not request.form.get("username"):
-            return apology("must provide username", 400)
+            return apology("Must provide username", 400)
 
         elif not request.form.get("password"):
-            return apology("must provide password", 400)
+            return apology("Must provide password", 400)
 
         rows = db.execute(
             "SELECT * FROM users WHERE username = ?",
@@ -49,7 +49,7 @@ def login():
         if len(rows) != 1 or not check_password_hash(
             rows[0]["password_hash"], request.form.get("password")
         ):
-            return apology("invalid username and/or password", 400)
+            return apology("Invalid username and/or password", 400)
 
         session["user_id"] = rows[0]["id"]
 
@@ -63,13 +63,13 @@ def register():
     """Register user"""
     if request.method == "POST":
         if not request.form.get("username"):
-            return apology("must provide username", 400)
+            return apology("Must provide username", 400)
 
         elif not request.form.get("password"):
-            return apology("must provide password", 400)
+            return apology("Must provide password", 400)
 
         elif request.form.get("password") != request.form.get("confirmation"):
-            return apology("passwords do not match", 400)
+            return apology("Passwords do not match", 400)
 
         # Ensure this username does not exist
         try:
@@ -86,7 +86,7 @@ def register():
             session["user_id"] = rows[0]["id"]
             flash(f"Successfully registered!")
         except ValueError:
-            return apology("username already exists", 400)
+            return apology("Username already exists", 400)
 
         return redirect("/")
     else:
@@ -100,9 +100,17 @@ def logout():
     return redirect("/")
 
 
-@app.route("/profile", methods=["GET", "POST"])
+@app.route("/profile", methods=["GET"])
 @login_required
 def profile():
+    """Show user profile information"""
+    user = db.execute("SELECT * FROM users WHERE id=?", session["user_id"])[0]
+    return render_template("profile.html", user=user)
+
+
+@app.route("/edit-profile", methods=["GET", "POST"])
+@login_required
+def edit_profile():
     """Let user edit profile information"""
     user = db.execute("SELECT * FROM users WHERE id=?", session["user_id"])[0]
 
@@ -111,7 +119,9 @@ def profile():
         bio = request.form['bio']
         password = request.form['password']
         if not username:
-            flash('Username is required!')
+            return apology("Must provide username", 400)
+        elif db.execute("SELECT * FROM users WHERE username=?", username):
+            return apology("Username already exists", 400)
         else:
             # Update the user in the database
             password_hash = generate_password_hash(password) if password else user["password_hash"]
@@ -122,4 +132,4 @@ def profile():
             flash('Profile updated successfully!')
             return redirect("/profile")
     else:
-        return render_template("profile.html", user=user)
+        return render_template("edit_profile.html", user=user)

@@ -23,6 +23,10 @@ nav .navbar-brand .purple {
     border-color: #9b68e7;
 }
 
+.text-primary {
+    color: #9b68e7 !important;
+}
+
 nav .navbar-brand .logo-image {
     height: 32px;
     width: auto;
