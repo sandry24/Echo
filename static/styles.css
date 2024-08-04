@@ -1,20 +1,47 @@
+body {
+    font-family: "Amiko", sans-serif;
+}
+
 nav .navbar-brand {
     font-size: xx-large;
     font-weight: 600;
 }
 
 nav .navbar-brand .purple {
-    color: #9867C5;
+    color: #9b68e7;
 }
 
 .btn {
-    background-color: #9867C5;
-    border-color: #9867C5;
+    background-color: #9b68e7;
+    border-color: #9b68e7;
     color: #fff;
 }
 
 .btn:hover {
     background-color: #fff;
-    color: #9867C5;
-    border-color: #9867C5;
+    color: #9b68e7;
+    border-color: #9b68e7;
+}
+
+nav .navbar-brand .logo-image {
+    height: 32px;
+    width: auto;
+}
+
+.amiko-regular {
+  font-family: "Amiko", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.amiko-semibold {
+  font-family: "Amiko", sans-serif;
+  font-weight: 600;
+  font-style: normal;
+}
+
+.amiko-bold {
+  font-family: "Amiko", sans-serif;
+  font-weight: 700;
+  font-style: normal;
 }
