@@ -1,0 +1,8 @@
+nav .navbar-brand {
+    font-size: xx-large;
+    font-weight: 600;
+}
+
+nav .navbar-brand .purple {
+    color: #9867C5;
+}
