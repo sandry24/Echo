@@ -47,7 +47,7 @@ def login():
         )
 
         if len(rows) != 1 or not check_password_hash(
-            rows[0]["hash"], request.form.get("password")
+            rows[0]["password_hash"], request.form.get("password")
         ):
             return apology("invalid username and/or password", 400)
 
@@ -74,7 +74,7 @@ def register():
         # Ensure this username does not exist
         try:
             db.execute(
-                "INSERT INTO users (username, hash) VALUES (?, ?)",
+                "INSERT INTO users (username, password_hash) VALUES (?, ?)",
                 request.form.get("username"),
                 generate_password_hash(request.form.get("password"))
             )
@@ -98,3 +98,28 @@ def logout():
     """Log user out"""
     session.clear()
     return redirect("/")
+
+
+@app.route("/profile", methods=["GET", "POST"])
+@login_required
+def profile():
+    """Let user edit profile information"""
+    user = db.execute("SELECT * FROM users WHERE id=?", session["user_id"])[0]
+
+    if request.method == "POST":
+        username = request.form['username']
+        bio = request.form['bio']
+        password = request.form['password']
+        if not username:
+            flash('Username is required!')
+        else:
+            # Update the user in the database
+            password_hash = generate_password_hash(password) if password else user["password_hash"]
+            db.execute(
+                'UPDATE users SET username = ?, bio = ?, password_hash = ? WHERE id = ?',
+                username, bio, password_hash, session["user_id"]
+            )
+            flash('Profile updated successfully!')
+            return redirect("/profile")
+    else:
+        return render_template("profile.html", user=user)
