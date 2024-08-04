@@ -6,3 +6,15 @@ nav .navbar-brand {
 nav .navbar-brand .purple {
     color: #9867C5;
 }
+
+.btn {
+    background-color: #9867C5;
+    border-color: #9867C5;
+    color: #fff;
+}
+
+.btn:hover {
+    background-color: #fff;
+    color: #9867C5;
+    border-color: #9867C5;
+}

@@ -5,7 +5,6 @@
 {% endblock %}
 
 {% block main %}
-    <!-- https://memegen.link/ -->
-    <!-- https://knowyourmeme.com/memes/grumpy-cat -->
-    <img alt="{{ top }}" class="border img-fluid" src="https://api.memegen.link/images/custom/{{ top | urlencode }}/{{ bottom | urlencode }}.jpg?background=https://img.freepik.com/premium-photo/red-caution-safety-urgent-3d-icon-attention-isolated-white-background-alert-exclamation-warning-sign-error-alarm-important-notice-danger-failure-symbol-forbidden-trouble-problem-message_79161-2284.jpg&width=400" title="{{ top }}">
+    <h1 class="fw-bold">{{ code }}: {{ message }}</h1>
+    <img alt="{{ message }}" width="400px" class="border img-fluid" src="https://img.freepik.com/premium-photo/red-caution-safety-urgent-3d-icon-attention-isolated-white-background-alert-exclamation-warning-sign-error-alarm-important-notice-danger-failure-symbol-forbidden-trouble-problem-message_79161-2284.jpg" title="{{ message }}">
 {% endblock %}

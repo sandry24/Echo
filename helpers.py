@@ -24,7 +24,7 @@ def apology(message, code=400):
             s = s.replace(old, new)
         return s
 
-    return render_template("apology.html", top=code, bottom=escape(message)), code
+    return render_template("apology.html", code=code, message=escape(message)), code
 
 
 def login_required(f):
