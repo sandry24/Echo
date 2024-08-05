@@ -18,11 +18,21 @@
                         <p class="form-control-plaintext border p-3 rounded" id="bio">{{ user['bio'] or 'No bio provided' }}</p>
                     </div>
 
-                    {% if not is_user_profile %}
+                    {% if user['id'] != session['user_id'] %}
                         <div class="d-flex gap-3">
-                            <a href="/follow/{{ user['id'] }}" class="btn btn-primary flex-grow-1">Follow</a>
+                            {% if followed %}
+                                <a href="/unfollow/{{ user['id'] }}" class="btn btn-outline-primary flex-grow-1">Unfollow</a>
+                            {% else %}
+                                <a href="/follow/{{ user['id'] }}" class="btn btn-primary flex-grow-1">Follow</a>
+                            {% endif %}
+
                             <a href="/message/{{ user['id'] }}" class="btn btn-primary flex-grow-1">Message</a>
-                            <a href="/block/{{ user['id'] }}" class="btn btn-danger flex-grow-1">Block</a>
+
+                            {% if blocked %}
+                                <a href="/unblock/{{ user['id'] }}" class="btn btn-outline-danger flex-grow-1">Unblock</a>
+                            {% else %}
+                                <a href="/block/{{ user['id'] }}" class="btn btn-danger flex-grow-1">Block</a>
+                            {% endif %}
                         </div>
                     {% else %}
                         <a href="/edit-profile" class="btn btn-primary w-100">Edit Profile</a>

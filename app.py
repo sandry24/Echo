@@ -110,8 +110,15 @@ def profile(username):
     if not user:
         return apology("User does not exist", 404)
     user = user[0]
-    is_user_profile = session["username"] == username  # Check if the current user is the owner of profile
-    return render_template("profile.html", user=user, is_user_profile=is_user_profile)
+
+    followed = bool(db.execute(
+        "SELECT * FROM follows WHERE follower_id = ? AND followed_id = ?", session["user_id"], user["id"]
+    ))
+    blocked = bool(db.execute(
+        "SELECT * FROM blocks WHERE blocker_id = ? AND blocked_id = ?", session["user_id"], user["id"]
+    ))
+
+    return render_template("profile.html", user=user, followed=followed, blocked=blocked)
 
 
 @app.route("/edit-profile", methods=["GET", "POST"])
