@@ -52,6 +52,7 @@ def login():
             return apology("Invalid username and/or password", 400)
 
         session["user_id"] = rows[0]["id"]
+        session["username"] = rows[0]["username"]
 
         return redirect("/")
     else:
@@ -84,6 +85,7 @@ def register():
             )
 
             session["user_id"] = rows[0]["id"]
+            session["username"] = rows[0]["username"]
             flash(f"Successfully registered!")
         except ValueError:
             return apology("Username already exists", 400)
@@ -100,12 +102,16 @@ def logout():
     return redirect("/")
 
 
-@app.route("/profile", methods=["GET"])
+@app.route("/profile/<username>")
 @login_required
-def profile():
+def profile(username):
     """Show user profile information"""
-    user = db.execute("SELECT * FROM users WHERE id=?", session["user_id"])[0]
-    return render_template("profile.html", user=user)
+    user = db.execute("SELECT * FROM users WHERE username=?", username)
+    if not user:
+        return apology("User does not exist", 404)
+    user = user[0]
+    is_user_profile = session["username"] == username  # Check if the current user is the owner of profile
+    return render_template("profile.html", user=user, is_user_profile=is_user_profile)
 
 
 @app.route("/edit-profile", methods=["GET", "POST"])
