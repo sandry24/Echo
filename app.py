@@ -1,5 +1,5 @@
 from cs50 import SQL
-from flask import Flask, flash, redirect, render_template, request, session
+from flask import Flask, flash, redirect, render_template, request, session, url_for
 from flask_session import Session
 from werkzeug.security import check_password_hash, generate_password_hash
 
@@ -111,12 +111,8 @@ def profile(username):
         return apology("User does not exist", 404)
     user = user[0]
 
-    followed = bool(db.execute(
-        "SELECT * FROM follows WHERE follower_id = ? AND followed_id = ?", session["user_id"], user["id"]
-    ))
-    blocked = bool(db.execute(
-        "SELECT * FROM blocks WHERE blocker_id = ? AND blocked_id = ?", session["user_id"], user["id"]
-    ))
+    followed = is_followed(session["user_id"], user['id'])
+    blocked = is_blocked(session["user_id"], user['id'])
 
     return render_template("profile.html", user=user, followed=followed, blocked=blocked)
 
@@ -146,6 +142,102 @@ def edit_profile():
             return redirect("/profile")
     else:
         return render_template("edit_profile.html", user=user)
+
+
+def is_followed(follower_id, followed_id):
+    """Returns if a user follows another user"""
+    return db.execute("SELECT * FROM follows WHERE follower_id = ? AND followed_id = ?", follower_id, followed_id)
+
+
+def is_blocked(blocker_id, blocked_id):
+    """Returns if a user blocked another user"""
+    return db.execute("SELECT * FROM blocks WHERE blocker_id = ? AND blocked_id = ?", blocker_id, blocked_id)
+
+
+@app.route('/follow/<int:user_id>', methods=['POST'])
+@login_required
+def follow_user(user_id):
+    """Follow a user"""
+    current_user_id = session["user_id"]
+
+    if current_user_id == user_id:
+        flash("You cannot follow yourself.")
+        return redirect(url_for('profile',
+                                username=db.execute("SELECT username FROM users WHERE id = ?", user_id)[0]['username']))
+
+    followed = is_followed(current_user_id, user_id)
+
+    if not followed:
+        db.execute("INSERT INTO follows (follower_id, followed_id) VALUES (?, ?)", current_user_id, user_id)
+        flash("You are now following this user.")
+
+    return redirect(url_for('profile',
+                            username=db.execute("SELECT username FROM users WHERE id = ?", user_id)[0]['username']))
+
+
+@app.route('/unfollow/<int:user_id>', methods=['POST'])
+@login_required
+def unfollow_user(user_id):
+    """Unfollow a user"""
+    current_user_id = session["user_id"]
+    followed = is_followed(current_user_id, user_id)
+    print(followed)
+
+    if followed:
+        db.execute("DELETE FROM follows WHERE follower_id = ? AND followed_id = ?", current_user_id, user_id)
+        flash("You have unfollowed this user.")
+
+    return redirect(url_for('profile',
+                            username=db.execute("SELECT username FROM users WHERE id = ?", user_id)[0]['username']))
+
+
+@app.route('/block/<int:user_id>', methods=['POST'])
+@login_required
+def block_user(user_id):
+    """Block a user"""
+    current_user_id = session["user_id"]
+
+    if current_user_id == user_id:
+        flash("You cannot block yourself.")
+        return redirect(url_for('profile', username=db.execute("SELECT username FROM users WHERE id = ?", user_id)[0]['username']))
+
+    blocked = is_blocked(current_user_id, user_id)
+
+    if not blocked:
+        db.execute("INSERT INTO blocks (blocker_id, blocked_id) VALUES (?, ?)", current_user_id, user_id)
+        flash("You have blocked this user.")
+
+    return redirect(url_for('profile', username=db.execute("SELECT username FROM users WHERE id = ?", user_id)[0]['username']))
+
+
+@app.route('/unblock/<int:user_id>', methods=['POST'])
+@login_required
+def unblock_user(user_id):
+    """Unblock a user"""
+    current_user_id = session["user_id"]
+    blocked = is_blocked(current_user_id, user_id)
+
+    if blocked:
+        db.execute("DELETE FROM blocks WHERE blocker_id = ? AND blocked_id = ?", current_user_id, user_id)
+        flash("You have unblocked this user.")
+
+    return redirect(url_for('profile', username=db.execute("SELECT username FROM users WHERE id = ?", user_id)[0]['username']))
+
+
+@app.route('/message/<int:user_id>', methods=['POST'])
+@login_required
+def message_user(user_id):
+    """Message a user"""
+    current_user_id = session["user_id"]
+    message_content = request.form.get("message")
+
+    # Implement message sending logic here (e.g., save to database, send notification, etc.)
+    # For simplicity, we will just display a success message
+    flash(f"Message sent to {db.execute('SELECT username FROM users WHERE id = ?', user_id)[0]['username']}: "
+          f"{message_content}")
+
+    return redirect(url_for('profile',
+                            username=db.execute("SELECT username FROM users WHERE id = ?", user_id)[0]['username']))
 
 
 @app.route("/search")

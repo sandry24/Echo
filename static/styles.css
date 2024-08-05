@@ -11,7 +11,7 @@ nav .navbar-brand {
     color: #9b68e7;
 }
 
-.btn-primary {
+.btn-primary, .btn-primary:active:focus {
     background-color: #9b68e7;
     border-color: #9b68e7;
     color: #fff;
@@ -23,7 +23,7 @@ nav .navbar-brand {
     border-color: #9b68e7;
 }
 
-.btn-outline-primary {
+.btn-outline-primary, .btn-outline-primary:active:focus {
     background-color: #fff;
     color: #9b68e7;
     border-color: #9b68e7;
@@ -35,7 +35,7 @@ nav .navbar-brand {
     color: #fff;
 }
 
-.btn-danger {
+.btn-danger, .btn-danger:active:focus {
     background-color: #e03444;
     border-color: #e03444;
     color: #fff;
@@ -47,7 +47,7 @@ nav .navbar-brand {
     border-color: #e03444;
 }
 
-.btn-outline-danger {
+.btn-outline-danger, .btn-outline-danger:active:focus {
     background-color: #fff;
     color: #e03444;
     border-color: #e03444;
