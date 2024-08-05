@@ -199,7 +199,8 @@ def block_user(user_id):
 
     if current_user_id == user_id:
         flash("You cannot block yourself.")
-        return redirect(url_for('profile', username=db.execute("SELECT username FROM users WHERE id = ?", user_id)[0]['username']))
+        return redirect(url_for('profile',
+                                username=db.execute("SELECT username FROM users WHERE id = ?", user_id)[0]['username']))
 
     blocked = is_blocked(current_user_id, user_id)
 
@@ -207,7 +208,8 @@ def block_user(user_id):
         db.execute("INSERT INTO blocks (blocker_id, blocked_id) VALUES (?, ?)", current_user_id, user_id)
         flash("You have blocked this user.")
 
-    return redirect(url_for('profile', username=db.execute("SELECT username FROM users WHERE id = ?", user_id)[0]['username']))
+    return redirect(url_for('profile',
+                            username=db.execute("SELECT username FROM users WHERE id = ?", user_id)[0]['username']))
 
 
 @app.route('/unblock/<int:user_id>', methods=['POST'])
@@ -221,7 +223,8 @@ def unblock_user(user_id):
         db.execute("DELETE FROM blocks WHERE blocker_id = ? AND blocked_id = ?", current_user_id, user_id)
         flash("You have unblocked this user.")
 
-    return redirect(url_for('profile', username=db.execute("SELECT username FROM users WHERE id = ?", user_id)[0]['username']))
+    return redirect(url_for('profile',
+                            username=db.execute("SELECT username FROM users WHERE id = ?", user_id)[0]['username']))
 
 
 @app.route('/message/<int:user_id>', methods=['POST'])
@@ -231,8 +234,7 @@ def message_user(user_id):
     current_user_id = session["user_id"]
     message_content = request.form.get("message")
 
-    # Implement message sending logic here (e.g., save to database, send notification, etc.)
-    # For simplicity, we will just display a success message
+    # TODO: Implement messaging function
     flash(f"Message sent to {db.execute('SELECT username FROM users WHERE id = ?', user_id)[0]['username']}: "
           f"{message_content}")
 
