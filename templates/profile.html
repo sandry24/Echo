@@ -19,30 +19,36 @@
                     </div>
 
                     {% if user['id'] != session['user_id'] %}
-                        <div class="d-flex gap-3">
-                            {% if followed %}
-                                <form action="{{ url_for('unfollow_user', user_id=user['id']) }}" method="post" class="d-flex flex-grow-1">
-                                    <button type="submit" class="btn btn-outline-primary w-100">Unfollow</button>
-                                </form>
-                            {% else %}
-                                <form action="{{ url_for('follow_user', user_id=user['id']) }}" method="post" class="d-flex flex-grow-1">
-                                    <button type="submit" class="btn btn-primary w-100">Follow</button>
-                                </form>
-                            {% endif %}
+                        <div class="row g-3">
+                            <div class="col-4">
+                                {% if followed %}
+                                    <form action="{{ url_for('unfollow_user', user_id=user['id']) }}" method="post">
+                                        <button type="submit" class="btn btn-outline-primary w-100">Unfollow</button>
+                                    </form>
+                                {% else %}
+                                    <form action="{{ url_for('follow_user', user_id=user['id']) }}" method="post">
+                                        <button type="submit" class="btn btn-primary w-100">Follow</button>
+                                    </form>
+                                {% endif %}
+                            </div>
 
-                            <form action="{{ url_for('message_user', user_id=user['id']) }}" method="post" class="d-flex flex-grow-1">
-                                <button type="submit" class="btn btn-primary w-100">Message</button>
-                            </form>
+                            <div class="col-4">
+                                <form action="{{ url_for('message_user', user_id=user['id']) }}" method="post">
+                                    <button type="submit" class="btn btn-primary w-100">Message</button>
+                                </form>
+                            </div>
 
-                            {% if blocked %}
-                                <form action="{{ url_for('unblock_user', user_id=user['id']) }}" method="post" class="d-flex flex-grow-1">
-                                    <button type="submit" class="btn btn-outline-danger w-100">Unblock</button>
-                                </form>
-                            {% else %}
-                                <form action="{{ url_for('block_user', user_id=user['id']) }}" method="post" class="d-flex flex-grow-1">
-                                    <button type="submit" class="btn btn-danger w-100">Block</button>
-                                </form>
-                            {% endif %}
+                            <div class="col-4">
+                                {% if blocked %}
+                                    <form action="{{ url_for('unblock_user', user_id=user['id']) }}" method="post">
+                                        <button type="submit" class="btn btn-outline-danger w-100">Unblock</button>
+                                    </form>
+                                {% else %}
+                                    <form action="{{ url_for('block_user', user_id=user['id']) }}" method="post">
+                                        <button type="submit" class="btn btn-danger w-100">Block</button>
+                                    </form>
+                                {% endif %}
+                            </div>
                         </div>
                     {% else %}
                         <a href="/edit-profile" class="btn btn-primary w-100">Edit Profile</a>
