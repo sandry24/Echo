@@ -132,7 +132,7 @@ def edit_profile():
         password = request.form['password']
         if not username:
             return apology("Must provide username", 400)
-        elif db.execute("SELECT * FROM users WHERE username=?", username):
+        elif db.execute("SELECT * FROM users WHERE username=? AND id!=?", username, session["user_id"]):
             return apology("Username already exists", 400)
         else:
             # Update the user in the database
@@ -141,8 +141,10 @@ def edit_profile():
                 'UPDATE users SET username = ?, bio = ?, password_hash = ? WHERE id = ?',
                 username, bio, password_hash, session["user_id"]
             )
+
             flash('Profile updated successfully!')
-            return redirect("/profile")
+            session["username"] = username
+            return redirect(f"/profile/{username}")
     else:
         return render_template("edit_profile.html", user=user)
 
