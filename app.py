@@ -143,7 +143,7 @@ def edit_profile():
             )
 
             flash('Profile updated successfully!')
-            session["username"] = username
+            session["username"] = username  # Update username in session
             return redirect(f"/profile/{username}")
     else:
         return render_template("edit_profile.html", user=user)
