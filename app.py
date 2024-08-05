@@ -109,12 +109,15 @@ def profile(username):
     user = db.execute("SELECT * FROM users WHERE username=?", username)
     if not user:
         return apology("User does not exist", 404)
+
     user = user[0]
+    followed = is_followed(session["user_id"], user["id"])
+    blocked = is_blocked(session["user_id"], user["id"])
+    followers_count = db.execute("SELECT COUNT(*) as cnt FROM follows WHERE followed_id=?", user["id"])[0]["cnt"]
+    following_count = db.execute("SELECT COUNT(*) as cnt FROM follows WHERE follower_id=?", user["id"])[0]["cnt"]
 
-    followed = is_followed(session["user_id"], user['id'])
-    blocked = is_blocked(session["user_id"], user['id'])
-
-    return render_template("profile.html", user=user, followed=followed, blocked=blocked)
+    return render_template("profile.html", user=user, followed=followed, blocked=blocked,
+                           followers_count=followers_count, following_count=following_count)
 
 
 @app.route("/edit-profile", methods=["GET", "POST"])

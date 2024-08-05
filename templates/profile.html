@@ -18,6 +18,14 @@
                         <p class="form-control-plaintext border p-3 rounded" id="bio">{{ user['bio'] or 'No bio provided' }}</p>
                     </div>
 
+                    <div class="text-center mb-4">
+                        <div class="d-flex justify-content-center">
+                            <h6 class="text-muted mb-0 me-3">Followers: {{ followers_count }}</h6>
+                            <h6 class="text-muted mb-0">Following: {{ following_count }}</h6>
+                        </div>
+                    </div>
+
+
                     {% if user['id'] != session['user_id'] %}
                         <div class="row g-3">
                             <div class="col-4">
