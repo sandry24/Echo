@@ -133,3 +133,14 @@ def edit_profile():
             return redirect("/profile")
     else:
         return render_template("edit_profile.html", user=user)
+
+
+@app.route("/search", methods=["GET"])
+@login_required
+def search():
+    username = request.args.get("username")
+    if username:
+        users = db.execute("SELECT * FROM users WHERE username LIKE ?", "%" + username + "%")
+        return render_template("search_results.html", users=users)
+    else:
+        return render_template("search.html")

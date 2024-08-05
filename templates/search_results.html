@@ -1,0 +1,22 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Search Results
+{% endblock %}
+
+{% block main %}
+    <h1 class="mt-4 mb-4">Search Results</h1>
+    {% if users %}
+        <ul class="list-group mx-auto w-50">
+            {% for user in users %}
+                <li class="list-group-item">
+                    <h5>{{ user.username }}</h5>
+                    <h6>{{ user.bio or 'No bio provided'}}</h6>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p class="mt-4">No users found with that username.</p>
+    {% endif %}
+    <a href="/search" class="btn btn-secondary mt-4">Search Again</a>
+{% endblock %}
