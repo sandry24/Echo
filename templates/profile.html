@@ -18,7 +18,15 @@
                         <p class="form-control-plaintext border p-3 rounded" id="bio">{{ user['bio'] or 'No bio provided' }}</p>
                     </div>
 
-                    <a href="{{ url_for('edit_profile') }}" class="btn btn-primary w-100">Edit Profile</a>
+                    {% if not is_user_profile %}
+                        <div class="d-flex gap-3">
+                            <a href="/follow/{{ user['id'] }}" class="btn btn-primary flex-grow-1">Follow</a>
+                            <a href="/message/{{ user['id'] }}" class="btn btn-primary flex-grow-1">Message</a>
+                            <a href="/block/{{ user['id'] }}" class="btn btn-danger flex-grow-1">Block</a>
+                        </div>
+                    {% else %}
+                        <a href="/edit-profile" class="btn btn-primary w-100">Edit Profile</a>
+                    {% endif %}
                 </div>
             </div>
         </div>

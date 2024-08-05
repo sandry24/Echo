@@ -10,7 +10,11 @@
         <ul class="list-group mx-auto w-50">
             {% for user in users %}
                 <li class="list-group-item">
-                    <h5>{{ user.username }}</h5>
+                    <h5>
+                        <a href="{{ url_for('profile', username=user.username) }}" class="text-decoration-none purple">
+                            {{ user.username }}
+                        </a>
+                    </h5>
                     <h6>{{ user.bio or 'No bio provided'}}</h6>
                 </li>
             {% endfor %}

@@ -141,7 +141,7 @@ def edit_profile():
         return render_template("edit_profile.html", user=user)
 
 
-@app.route("/search", methods=["GET"])
+@app.route("/search")
 @login_required
 def search():
     username = request.args.get("username")
