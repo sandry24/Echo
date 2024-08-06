@@ -2,6 +2,7 @@ from cs50 import SQL
 from flask import Flask, flash, redirect, render_template, request, session, url_for
 from flask_session import Session
 from werkzeug.security import check_password_hash, generate_password_hash
+import pytz
 
 from helpers import apology, login_required
 
@@ -259,3 +260,22 @@ def search():
         return render_template("search_results.html", users=users)
     else:
         return render_template("search.html")
+
+
+@app.route('/messages')
+@login_required
+def messages():
+    user_id = session['user_id']
+    conversations = db.execute('''
+        SELECT c.id, u.username, MAX(m.created_at) AS last_message
+        FROM conversations c
+        JOIN conversation_participants cp1 ON c.id = cp1.conversation_id
+        JOIN conversation_participants cp2 ON c.id = cp2.conversation_id
+        JOIN users u ON cp2.user_id = u.id
+        LEFT JOIN messages m ON c.id = m.conversation_id
+        WHERE cp1.user_id = ? AND cp2.user_id != cp1.user_id
+        GROUP BY c.id, u.username
+        ORDER BY last_message DESC
+    ''', user_id)
+    return render_template('messages.html', conversations=conversations)
+

@@ -1,0 +1,17 @@
+{% extends "layout.html" %}
+
+{% block title %}Direct Messages{% endblock %}
+
+{% block main %}
+    <div class="container">
+        <h3 class="my-4">Direct Messages</h3>
+        <ul class="list-group">
+            {% for conversation in conversations %}
+                <li class="list-group-item">
+                    <a>{{ conversation['username'] }}</a>
+                    <span class="text-muted float-end">{{ conversation['last_message'] }}</span>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endblock %}
