@@ -237,6 +237,18 @@ def unblock_user(user_id):
     return redirect(url_for('profile', username=username))
 
 
+@app.route("/search")
+@login_required
+def search():
+    """Search for users"""
+    username = request.args.get("username")
+    if username:
+        users = db.execute("SELECT * FROM users WHERE username LIKE ?", "%" + username + "%")
+        return render_template("search_results.html", users=users)
+    else:
+        return render_template("search.html")
+
+
 @app.route('/message/<int:user_id>', methods=['POST'])
 @login_required
 def message_user(user_id):
@@ -251,20 +263,10 @@ def message_user(user_id):
     return redirect(url_for('profile', username=username))
 
 
-@app.route("/search")
-@login_required
-def search():
-    username = request.args.get("username")
-    if username:
-        users = db.execute("SELECT * FROM users WHERE username LIKE ?", "%" + username + "%")
-        return render_template("search_results.html", users=users)
-    else:
-        return render_template("search.html")
-
-
 @app.route('/messages')
 @login_required
 def messages():
+    """Display all current conversations"""
     user_id = session['user_id']
     conversations = db.execute('''
         SELECT c.id, u.username, MAX(m.created_at) AS last_message
@@ -278,4 +280,32 @@ def messages():
         ORDER BY last_message DESC
     ''', user_id)
     return render_template('messages.html', conversations=conversations)
+
+
+@app.route('/messages/<int:conversation_id>')
+@login_required
+def conversation(conversation_id):
+    """Open a conversation with a user"""
+    user_id = session['user_id']
+
+    messages = db.execute('''
+        SELECT m.content, m.created_at, u.username
+        FROM messages m
+        JOIN users u ON m.sender_id = u.id
+        WHERE m.conversation_id = ?
+        ORDER BY m.created_at
+    ''', conversation_id)
+
+    other_user = db.execute('''
+        SELECT u.username
+        FROM conversation_participants cp
+        JOIN users u ON cp.user_id = u.id
+        WHERE cp.conversation_id = ? AND cp.user_id != ?
+    ''', conversation_id, user_id)
+
+    other_username = other_user[0]['username'] if other_user else "Unknown"
+    return render_template('conversation.html', messages=messages,
+                           conversation_id=conversation_id, other_username=other_username)
+
+
 

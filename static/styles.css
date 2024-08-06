@@ -85,3 +85,24 @@ nav .navbar-brand .logo-image {
   font-weight: 700;
   font-style: normal;
 }
+
+#messageContainer::-webkit-scrollbar {
+    width: 8px;
+}
+
+#messageContainer::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 8px;
+}
+
+#messageContainer::-webkit-scrollbar-thumb {
+    background-color: #d4d4d4;
+    border-radius: 8px;
+    border: 2px solid transparent;
+}
+
+#messageContainer::-webkit-scrollbar-thumb:hover {
+    background-color: #c0c0c0;
+}
+
+

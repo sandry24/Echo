@@ -1,0 +1,79 @@
+{% extends "layout.html" %}
+
+{% block title %}Conversation{% endblock %}
+
+{% block main %}
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-10">
+                <div class="card shadow-sm border-0">
+                    <div class="card-header d-flex align-items-center bg-light border-bottom-0 position-relative">
+                        <a href="{{ url_for('messages') }}" class="btn btn-link text-decoration-none purple position-absolute top-0 start-0 mt-2 ms-2">
+                            <i class="bi bi-arrow-left-circle"></i> Back
+                        </a>
+                        <div class="d-flex justify-content-center w-100">
+                            <h3 class="mb-0 purple">
+                                <a href="{{ url_for('profile', username=other_username) }}" class="text-decoration-none purple">
+                                    {{ other_username }}
+                                </a>
+                            </h3>
+                        </div>
+                    </div>
+                    <div class="card-body p-4 bg-light rounded" id="messageContainer" style="max-height: 500px; overflow-y: auto;">
+                        <div class="d-flex flex-column gap-3">
+                            {% for message in messages %}
+                                {% if message['username'] == session['username'] %}
+                                    <!-- User's own messages -->
+                                    <div class="d-flex justify-content-end">
+                                        <div class="bg-primary text-white p-3 rounded-3 shadow-sm">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <strong>You</strong>
+                                                <small class="text-muted ms-2">{{ message['created_at'] }}</small>
+                                            </div>
+                                            <p class="mb-0 mt-1">{{ message['content'] }}</p>
+                                        </div>
+                                    </div>
+                                {% else %}
+                                    <!-- Other user's messages -->
+                                    <div class="d-flex justify-content-start">
+                                        <div class="bg-white border p-3 rounded-3 shadow-sm">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <strong>{{ message['username'] }}</strong>
+                                                <small class="text-muted ms-2">{{ message['created_at'] }}</small>
+                                            </div>
+                                            <p class="mb-0 mt-1">{{ message['content'] }}</p>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="card-footer bg-light border-top-0">
+                        <form action="" method="post">
+                            <div class="input-group">
+                                <input type="text" name="content" class="form-control" placeholder="Type a message..." aria-label="Type a message..." aria-describedby="button-addon2" required>
+                                <button class="btn btn-primary text-white" type="submit" id="button-addon2">Send</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+
+{% block scripts %}
+    <script>
+        // Function to scroll to the bottom of the message container
+        function scrollToBottom() {
+            var messageContainer = document.getElementById('messageContainer');
+            messageContainer.scrollTop = messageContainer.scrollHeight;
+        }
+
+        // Call the function when the page is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            scrollToBottom();
+        });
+    </script>
+{% endblock %}
