@@ -142,17 +142,19 @@ def edit_profile():
             return apology("Must provide username", 400)
         elif db.execute("SELECT * FROM users WHERE username=? AND id!=?", username, session["user_id"]):
             return apology("Username already exists", 400)
-        else:
-            # Update the user in the database
-            password_hash = generate_password_hash(password) if password else user["password_hash"]
-            db.execute(
-                'UPDATE users SET username = ?, bio = ?, password_hash = ? WHERE id = ?',
-                username, bio, password_hash, session["user_id"]
-            )
 
-            flash('Profile updated successfully!')
-            session["username"] = username  # Update username in session
-            return redirect(f"/profile/{username}")
+        if len(bio) > 500:
+            return apology("Bio cannot exceed 500 characters", 400)
+
+        password_hash = generate_password_hash(password) if password else user["password_hash"]
+        db.execute(
+            'UPDATE users SET username = ?, bio = ?, password_hash = ? WHERE id = ?',
+            username, bio, password_hash, session["user_id"]
+        )
+
+        flash('Profile updated successfully!')
+        session["username"] = username  # Update username in session
+        return redirect(f"/profile/{username}")
     else:
         return render_template("edit_profile.html", user=user)
 
