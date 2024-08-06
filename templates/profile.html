@@ -41,7 +41,7 @@
                             </div>
 
                             <div class="col-4">
-                                <form action="" method="post">
+                                <form action="{{ url_for('start_conversation', receiver_id=user['id']) }}" method="post">
                                     <button type="submit" class="btn btn-primary w-100">Message</button>
                                 </form>
                             </div>

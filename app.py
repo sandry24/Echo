@@ -303,9 +303,36 @@ def conversation(conversation_id):
                            conversation_id=conversation_id, other_username=other_username)
 
 
+@app.route('/start_conversation/<int:receiver_id>', methods=['POST'])
+def start_conversation(receiver_id):
+    user_id = session['user_id']
+
+    conversation = db.execute('''
+        SELECT c.id 
+        FROM conversations c
+        JOIN conversation_participants cp1 ON c.id = cp1.conversation_id
+        JOIN conversation_participants cp2 ON c.id = cp2.conversation_id
+        WHERE cp1.user_id = ? AND cp2.user_id = ? OR cp1.user_id = ? AND cp2.user_id = ?
+        LIMIT 1
+    ''', user_id, receiver_id, receiver_id, user_id)
+
+    if conversation:
+        conversation_id = conversation[0]['id']
+    else:
+        db.execute('INSERT INTO conversations (created_at) VALUES (CURRENT_TIMESTAMP)')
+        conversation_id = db.execute('SELECT last_insert_rowid()')[0]['last_insert_rowid()']
+        db.execute('INSERT INTO conversation_participants (conversation_id, user_id) VALUES (?, ?)',
+                   conversation_id, user_id)
+        db.execute('INSERT INTO conversation_participants (conversation_id, user_id) VALUES (?, ?)',
+                   conversation_id, receiver_id)
+
+    return redirect(url_for('conversation', conversation_id=conversation_id))
+
+
 @app.route('/send_message/<int:conversation_id>', methods=['POST'])
 @login_required
 def send_message(conversation_id):
+    """Send a message to a user"""
     user_id = session['user_id']
     content = request.form['content']
 
