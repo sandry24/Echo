@@ -41,9 +41,14 @@
                             </div>
 
                             <div class="col-4">
-                                <form action="{{ url_for('start_conversation', receiver_id=user['id']) }}" method="post">
-                                    <button type="submit" class="btn btn-primary w-100">Message</button>
-                                </form>
+                                {% if blocked %}
+                                    <button type="button" class="btn btn-secondary w-100" disabled>Message</button>
+                                    <p class="text-danger mt-2">Unblock this user to message them.</p>
+                                {% else %}
+                                    <form action="{{ url_for('start_conversation', receiver_id=user['id']) }}" method="post">
+                                        <button type="submit" class="btn btn-primary w-100">Message</button>
+                                    </form>
+                                {% endif %}
                             </div>
 
                             <div class="col-4">
