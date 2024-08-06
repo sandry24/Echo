@@ -25,7 +25,7 @@
                                 {% if message['username'] == session['username'] %}
                                     <!-- User's own messages -->
                                     <div class="d-flex justify-content-end">
-                                        <div class="bg-purple text-white p-3 rounded-3 shadow-sm">
+                                        <div class="bg-purple text-white p-3 rounded-3 shadow-sm text-break text-start">
                                             <div class="d-flex justify-content-between align-items-center">
                                                 <strong>You</strong>
                                                 <small class="text-muted ms-2">{{ message['created_at'] }}</small>
@@ -36,7 +36,7 @@
                                 {% else %}
                                     <!-- Other user's messages -->
                                     <div class="d-flex justify-content-start">
-                                        <div class="bg-white border p-3 rounded-3 shadow-sm">
+                                        <div class="bg-white border p-3 rounded-3 shadow-sm text-break text-start">
                                             <div class="d-flex justify-content-between align-items-center">
                                                 <strong>{{ message['username'] }}</strong>
                                                 <small class="text-muted ms-2">{{ message['created_at'] }}</small>
@@ -61,7 +61,6 @@
         </div>
     </div>
 {% endblock %}
-
 
 {% block scripts %}
     <script>

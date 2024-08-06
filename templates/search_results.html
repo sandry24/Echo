@@ -15,7 +15,9 @@
                             {{ user.username }}
                         </a>
                     </h5>
-                    <h6>{{ user.bio or 'No bio provided'}}</h6>
+                    <h6 class="text-truncate" style="max-width: 100%;">
+                        {{ user.bio or 'No bio provided' }}
+                    </h6>
                 </li>
             {% endfor %}
         </ul>
