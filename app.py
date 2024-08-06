@@ -257,25 +257,37 @@ def messages():
     """Display all current conversations"""
     user_id = session['user_id']
     conversations = db.execute('''
-        SELECT c.id, u.username, MAX(m.created_at) AS last_message_time, 
-               (SELECT content FROM messages m2 
-                WHERE m2.conversation_id = c.id 
-                ORDER BY m2.created_at DESC 
-                LIMIT 1) AS last_message
+        SELECT c.id, u.username, 
+               MAX(m.created_at) AS last_message_time, 
+               lm.content AS last_message, 
+               lm.sender_username AS last_message_sender
         FROM conversations c
         JOIN conversation_participants cp1 ON c.id = cp1.conversation_id
         JOIN conversation_participants cp2 ON c.id = cp2.conversation_id
         JOIN users u ON cp2.user_id = u.id
         LEFT JOIN messages m ON c.id = m.conversation_id
+        LEFT JOIN (
+            SELECT m2.conversation_id, 
+                   m2.content, 
+                   u2.username AS sender_username
+            FROM messages m2
+            JOIN users u2 ON u2.id = m2.sender_id
+            WHERE m2.created_at = (
+                SELECT MAX(m3.created_at)
+                FROM messages m3
+                WHERE m3.conversation_id = m2.conversation_id
+            )
+        ) lm ON c.id = lm.conversation_id
         WHERE cp1.user_id = ? 
           AND cp2.user_id != cp1.user_id
           AND NOT EXISTS (
               SELECT 1 FROM blocks b
               WHERE b.blocker_id = cp1.user_id AND b.blocked_id = cp2.user_id
           )
-        GROUP BY c.id, u.username
+        GROUP BY c.id, u.username, lm.content, lm.sender_username
         ORDER BY last_message_time DESC
     ''', user_id)
+
     return render_template('messages.html', conversations=conversations)
 
 
