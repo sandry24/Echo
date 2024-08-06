@@ -308,4 +308,11 @@ def conversation(conversation_id):
                            conversation_id=conversation_id, other_username=other_username)
 
 
-
+@app.route('/send_message/<int:conversation_id>', methods=['POST'])
+@login_required
+def send_message(conversation_id):
+    user_id = session['user_id']
+    content = request.form['content']
+    db.execute('INSERT INTO messages (conversation_id, sender_id, content) VALUES (?, ?, ?)',
+               conversation_id, user_id, content)
+    return redirect(url_for('conversation', conversation_id=conversation_id))

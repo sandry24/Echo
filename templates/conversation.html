@@ -25,7 +25,7 @@
                                 {% if message['username'] == session['username'] %}
                                     <!-- User's own messages -->
                                     <div class="d-flex justify-content-end">
-                                        <div class="bg-primary text-white p-3 rounded-3 shadow-sm">
+                                        <div class="bg-purple text-white p-3 rounded-3 shadow-sm">
                                             <div class="d-flex justify-content-between align-items-center">
                                                 <strong>You</strong>
                                                 <small class="text-muted ms-2">{{ message['created_at'] }}</small>
@@ -49,10 +49,10 @@
                         </div>
                     </div>
                     <div class="card-footer bg-light border-top-0">
-                        <form action="" method="post">
+                        <form action="{{ url_for('send_message', conversation_id=conversation_id) }}" method="post">
                             <div class="input-group">
-                                <input type="text" name="content" class="form-control" placeholder="Type a message..." aria-label="Type a message..." aria-describedby="button-addon2" required>
-                                <button class="btn btn-primary text-white" type="submit" id="button-addon2">Send</button>
+                                <input type="text" name="content" autocomplete="off" class="form-control" placeholder="Type a message..." aria-label="Type a message..." aria-describedby="button-addon2" required>
+                                <button class="btn btn-primary" type="submit" id="button-addon2">Send</button>
                             </div>
                         </form>
                     </div>
