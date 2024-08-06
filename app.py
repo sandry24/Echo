@@ -286,7 +286,6 @@ def messages():
     return render_template('messages.html', conversations=conversations)
 
 
-
 @app.route('/messages/<int:conversation_id>')
 @login_required
 def conversation(conversation_id):
