@@ -120,6 +120,13 @@ def profile(username):
                            followers_count=followers_count, following_count=following_count)
 
 
+@app.route("/profile")
+@login_required
+def user_profile():
+    """Redirect user to his own profile"""
+    return redirect(url_for('profile', username=session["username"]))
+
+
 @app.route("/edit-profile", methods=["GET", "POST"])
 @login_required
 def edit_profile():
