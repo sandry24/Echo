@@ -249,20 +249,6 @@ def search():
         return render_template("search.html")
 
 
-@app.route('/message/<int:user_id>', methods=['POST'])
-@login_required
-def message_user(user_id):
-    """Message a user"""
-    current_user_id = session["user_id"]
-    message_content = request.form.get("message")
-    username = db.execute("SELECT username FROM users WHERE id = ?", user_id)[0]['username']
-
-    # TODO: Implement messaging function
-    flash(f"Message sent to {username}: {message_content}")
-
-    return redirect(url_for('profile', username=username))
-
-
 @app.route('/messages')
 @login_required
 def messages():
@@ -279,7 +265,12 @@ def messages():
         JOIN conversation_participants cp2 ON c.id = cp2.conversation_id
         JOIN users u ON cp2.user_id = u.id
         LEFT JOIN messages m ON c.id = m.conversation_id
-        WHERE cp1.user_id = ? AND cp2.user_id != cp1.user_id
+        WHERE cp1.user_id = ? 
+          AND cp2.user_id != cp1.user_id
+          AND NOT EXISTS (
+              SELECT 1 FROM blocks b
+              WHERE b.blocker_id = cp1.user_id AND b.blocked_id = cp2.user_id
+          )
         GROUP BY c.id, u.username
         ORDER BY last_message_time DESC
     ''', user_id)
@@ -317,6 +308,19 @@ def conversation(conversation_id):
 def send_message(conversation_id):
     user_id = session['user_id']
     content = request.form['content']
+
+    blocked = db.execute('''
+        SELECT 1 FROM blocks
+        WHERE blocker_id = (SELECT cp2.user_id FROM conversation_participants cp2
+                            WHERE cp2.conversation_id = ? AND cp2.user_id != ?)
+          AND blocked_id = ?
+    ''', conversation_id, user_id, user_id)
+
+    if blocked:
+        flash('You cannot send a message to this user because they have blocked you.')
+        return redirect(url_for('conversation', conversation_id=conversation_id))
+
     db.execute('INSERT INTO messages (conversation_id, sender_id, content) VALUES (?, ?, ?)',
                conversation_id, user_id, content)
     return redirect(url_for('conversation', conversation_id=conversation_id))
+
