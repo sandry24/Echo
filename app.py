@@ -269,7 +269,11 @@ def messages():
     """Display all current conversations"""
     user_id = session['user_id']
     conversations = db.execute('''
-        SELECT c.id, u.username, MAX(m.created_at) AS last_message
+        SELECT c.id, u.username, MAX(m.created_at) AS last_message_time, 
+               (SELECT content FROM messages m2 
+                WHERE m2.conversation_id = c.id 
+                ORDER BY m2.created_at DESC 
+                LIMIT 1) AS last_message
         FROM conversations c
         JOIN conversation_participants cp1 ON c.id = cp1.conversation_id
         JOIN conversation_participants cp2 ON c.id = cp2.conversation_id
@@ -277,9 +281,10 @@ def messages():
         LEFT JOIN messages m ON c.id = m.conversation_id
         WHERE cp1.user_id = ? AND cp2.user_id != cp1.user_id
         GROUP BY c.id, u.username
-        ORDER BY last_message DESC
+        ORDER BY last_message_time DESC
     ''', user_id)
     return render_template('messages.html', conversations=conversations)
+
 
 
 @app.route('/messages/<int:conversation_id>')
