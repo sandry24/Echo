@@ -5,19 +5,25 @@
 {% block main %}
     <div class="container">
         <h3 class="my-4">Direct Messages</h3>
-        <ul class="list-group mx-auto w-50">
-            {% for conversation in conversations %}
-                <li class="list-group-item position-relative">
-                    <a href="{{ url_for('conversation', conversation_id=conversation['id']) }}" class="purple text-decoration-none position-absolute start-50 translate-middle-x fs-5">
-                        {{ conversation['username'] }}
-                    </a>
-                    <span class="text-muted position-relative float-end">{{ conversation['last_message_time'] }}</span>
-                    <br>
-                    <div class="mt-2 text-muted position-relative text-center text-truncate" style="max-width: 100%;">
-                        {{ conversation['last_message'] }}
-                    </div>
-                </li>
-            {% endfor %}
-        </ul>
+        {% if conversations %}
+            <ul class="list-group mx-auto w-50">
+                {% for conversation in conversations %}
+                    <li class="list-group-item position-relative">
+                        <a href="{{ url_for('conversation', conversation_id=conversation['id']) }}" class="purple text-decoration-none position-absolute start-50 translate-middle-x fs-5">
+                            {{ conversation['username'] }}
+                        </a>
+                        <span class="text-muted position-relative float-end">{{ conversation['last_message_time'] }}</span>
+                        <br>
+                        <div class="mt-2 text-muted position-relative text-center text-truncate" style="max-width: 100%;">
+                            {{ conversation['last_message'] }}
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <div class="d-flex justify-content-center align-items-center" style="height: 300px;">
+                <p class="text-center text-muted">You don’t have any direct messages yet. Start a conversation with someone to get chatting!</p>
+            </div>
+        {% endif %}
     </div>
 {% endblock %}
