@@ -39,6 +39,10 @@ nav .navbar-brand {
     color: #fff;
 }
 
+.btn-link:active:focus, .btn-link:hover {
+    color: #7a4dc4
+}
+
 .btn-danger, .btn-danger:active:focus {
     background-color: #e03444;
     border-color: #e03444;
