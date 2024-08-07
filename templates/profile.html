@@ -20,8 +20,16 @@
 
                     <div class="text-center mb-4">
                         <div class="d-flex justify-content-center">
-                            <h6 class="text-muted mb-0 me-3">Followers: {{ followers_count }}</h6>
-                            <h6 class="text-muted mb-0">Following: {{ following_count }}</h6>
+                            <h6 class="text-muted mb-0 me-3">
+                                <a href="{{ url_for('followers') }}" class="text-muted text-decoration-none">
+                                    Followers: {{ followers_count }}
+                                </a>
+                            </h6>
+                            <h6 class="text-muted mb-0">
+                                <a href="{{ url_for('following') }}" class="text-muted text-decoration-none">
+                                    Following: {{ following_count }}
+                                </a>
+                            </h6>
                         </div>
                     </div>
 

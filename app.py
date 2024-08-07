@@ -541,3 +541,34 @@ def delete_comment(comment_id):
 
     flash("Comment deleted successfully.", "success")
     return redirect(url_for('feed'))
+
+
+@app.route("/followers")
+@login_required
+def followers():
+    """Show users who follow the current user"""
+    user_id = session['user_id']
+    followers_list = db.execute("""
+        SELECT u.id, u.username, u.bio
+        FROM follows f
+        JOIN users u ON f.follower_id = u.id
+        WHERE f.followed_id = ?
+    """, user_id)
+
+    return render_template("followers.html", users=followers_list, is_followed=is_followed)
+
+
+@app.route("/following")
+@login_required
+def following():
+    """Show users that the current user follows"""
+    user_id = session['user_id']
+    following_list = db.execute("""
+        SELECT u.id, u.username, u.bio
+        FROM follows f
+        JOIN users u ON f.followed_id = u.id
+        WHERE f.follower_id = ?
+    """, user_id)
+
+    return render_template("following.html", users=following_list, is_followed=is_followed)
+
