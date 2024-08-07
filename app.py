@@ -543,11 +543,10 @@ def delete_comment(comment_id):
     return redirect(url_for('feed'))
 
 
-@app.route("/followers")
+@app.route("/followers/<int:user_id>")
 @login_required
-def followers():
+def followers(user_id):
     """Show users who follow the current user"""
-    user_id = session['user_id']
     followers_list = db.execute("""
         SELECT u.id, u.username, u.bio
         FROM follows f
@@ -558,11 +557,10 @@ def followers():
     return render_template("followers.html", users=followers_list, is_followed=is_followed)
 
 
-@app.route("/following")
+@app.route("/following/<int:user_id>")
 @login_required
-def following():
+def following(user_id):
     """Show users that the current user follows"""
-    user_id = session['user_id']
     following_list = db.execute("""
         SELECT u.id, u.username, u.bio
         FROM follows f
