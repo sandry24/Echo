@@ -1,6 +1,7 @@
 # Echo
 
-## Video Demo:  https://youtu.be/Xh7-RivFjEw
+## Link: https://sandry24.pythonanywhere.com/
+## Video Demo: https://youtu.be/Xh7-RivFjEw
 ## Description:
 
 Echo is a modern social media platform designed to facilitate meaningful connections between users through a blend of direct messaging, content sharing, and social interaction. Developed as part of my final project for CS50, Echo leverages the Flask framework and SQLite database to deliver a robust and feature-rich application. The platform aims to provide an engaging and user-friendly experience, integrating key functionalities that are central to contemporary social media platforms.
