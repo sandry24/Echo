@@ -116,8 +116,16 @@ def profile(username):
     followers_count = db.execute("SELECT COUNT(*) as cnt FROM follows WHERE followed_id=?", user["id"])[0]["cnt"]
     following_count = db.execute("SELECT COUNT(*) as cnt FROM follows WHERE follower_id=?", user["id"])[0]["cnt"]
 
+    posts = db.execute("""
+        SELECT id, user_id, content, created_at
+        FROM posts
+        WHERE user_id = ?
+        ORDER BY created_at DESC
+    """, user["id"])
+
     return render_template("profile.html", user=user, followed=followed, blocked=blocked,
-                           followers_count=followers_count, following_count=following_count)
+                           followers_count=followers_count, following_count=following_count,
+                           posts=posts)
 
 
 @app.route("/profile")
@@ -511,7 +519,11 @@ def delete_post(post_id):
     db.execute("DELETE FROM posts WHERE id = ?", post_id)
 
     flash("Post deleted successfully.", "success")
-    return redirect(url_for('feed'))
+    redirect_page = request.args.get('redirect', 'feed')
+    if redirect_page == 'profile':
+        return redirect(url_for('profile', username=session['username']))
+    else:
+        return redirect(url_for('feed'))
 
 
 @app.route("/delete_comment/<int:comment_id>", methods=["POST"])
@@ -529,5 +541,3 @@ def delete_comment(comment_id):
 
     flash("Comment deleted successfully.", "success")
     return redirect(url_for('feed'))
-
-
