@@ -402,7 +402,7 @@ def feed():
 
     # Fetch posts from users that the current user follows
     posts = db.execute('''
-        SELECT p.id, p.content, p.created_at, u.username, 
+        SELECT p.id, p.user_id, p.content, p.created_at, u.username, 
                COUNT(l.id) AS like_count,
                EXISTS (
                    SELECT 1 FROM likes l2 
@@ -420,7 +420,7 @@ def feed():
     ''', user_id, user_id, user_id)
 
     comments = db.execute('''
-        SELECT c.id, c.content, c.created_at, c.post_id, u.username 
+        SELECT c.id, c.user_id, c.content, c.created_at, c.post_id, u.username 
         FROM comments c
         JOIN users u ON c.user_id = u.id
         WHERE c.post_id IN (SELECT id FROM posts)
@@ -490,3 +490,44 @@ def explore():
     ''', user_id, user_id)
 
     return render_template("explore.html", users=users)
+
+
+@app.route("/delete_post/<int:post_id>", methods=["POST"])
+@login_required
+def delete_post(post_id):
+    """Delete a post if it belongs to the current user."""
+    user_id = session['user_id']
+
+    # Check if the post exists and belongs to the user
+    post = db.execute("SELECT * FROM posts WHERE id = ? AND user_id = ?", post_id, user_id)
+
+    if not post:
+        flash("Post not found or you do not have permission to delete it.", "danger")
+        return redirect(url_for('feed'))
+
+    # Delete the post with comments and likes first to not damage db integrity
+    db.execute("DELETE FROM comments WHERE post_id = ?", post_id)
+    db.execute("DELETE FROM likes WHERE post_id = ?", post_id)
+    db.execute("DELETE FROM posts WHERE id = ?", post_id)
+
+    flash("Post deleted successfully.", "success")
+    return redirect(url_for('feed'))
+
+
+@app.route("/delete_comment/<int:comment_id>", methods=["POST"])
+@login_required
+def delete_comment(comment_id):
+    """Delete a comment if it belongs to the current user."""
+    user_id = session['user_id']
+    comment = db.execute("SELECT * FROM comments WHERE id = ? AND user_id = ?", comment_id, user_id)
+
+    if not comment:
+        flash("Comment not found or you do not have permission to delete it.", "danger")
+        return redirect(url_for('feed'))
+
+    db.execute("DELETE FROM comments WHERE id = ?", comment_id)
+
+    flash("Comment deleted successfully.", "success")
+    return redirect(url_for('feed'))
+
+
