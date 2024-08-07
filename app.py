@@ -26,7 +26,7 @@ def after_request(response):
 @app.route("/")
 @login_required
 def index():
-    return apology("TODO")
+    return redirect(url_for("feed"))
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -393,3 +393,100 @@ def create_post():
 
     return render_template("create_post.html")
 
+
+@app.route("/feed")
+@login_required
+def feed():
+    """Display the feed with posts from followed users."""
+    user_id = session['user_id']
+
+    # Fetch posts from users that the current user follows
+    posts = db.execute('''
+        SELECT p.id, p.content, p.created_at, u.username, 
+               COUNT(l.id) AS like_count,
+               EXISTS (
+                   SELECT 1 FROM likes l2 
+                   WHERE l2.user_id = ? AND l2.post_id = p.id
+               ) AS liked_by_user
+        FROM posts p
+        JOIN users u ON p.user_id = u.id
+        LEFT JOIN likes l ON p.id = l.post_id
+        WHERE p.user_id = ? OR EXISTS (
+            SELECT 1 FROM follows f
+            WHERE f.follower_id = ? AND f.followed_id = p.user_id
+        )
+        GROUP BY p.id
+        ORDER BY p.created_at DESC
+    ''', user_id, user_id, user_id)
+
+    comments = db.execute('''
+        SELECT c.id, c.content, c.created_at, c.post_id, u.username 
+        FROM comments c
+        JOIN users u ON c.user_id = u.id
+        WHERE c.post_id IN (SELECT id FROM posts)
+        ORDER BY c.created_at ASC
+    ''')
+
+    grouped_comments = {}
+    for comment in comments:
+        post_id = comment['post_id']
+        if post_id not in grouped_comments:
+            grouped_comments[post_id] = []
+        grouped_comments[post_id].append(comment)
+
+    return render_template("feed.html", posts=posts, comments=grouped_comments)
+
+
+@app.route("/toggle_like/<int:post_id>", methods=["POST"])
+@login_required
+def toggle_like(post_id):
+    """Toggle like status for a post."""
+    user_id = session["user_id"]
+
+    liked = db.execute("SELECT 1 FROM likes WHERE user_id = ? AND post_id = ?", user_id, post_id)
+
+    if liked:
+        db.execute("DELETE FROM likes WHERE user_id = ? AND post_id = ?", user_id, post_id)
+    else:
+        db.execute("INSERT INTO likes (user_id, post_id) VALUES (?, ?)", user_id, post_id)
+
+    return redirect(url_for("feed"))
+
+
+@app.route("/add_comment/<int:post_id>", methods=["POST"])
+@login_required
+def add_comment(post_id):
+    """Add a comment to a post."""
+    user_id = session["user_id"]
+    content = request.form.get("content")
+
+    if not content:
+        flash("Comment cannot be empty!", "danger")
+        return redirect(url_for("feed"))
+
+    db.execute(
+        "INSERT INTO comments (user_id, post_id, content) VALUES (?, ?, ?)",
+        user_id, post_id, content
+    )
+
+    flash("Comment added successfully!", "success")
+    return redirect(url_for("feed"))
+
+
+@app.route("/explore")
+@login_required
+def explore():
+    """Explore and follow new users."""
+    user_id = session['user_id']
+
+    users = db.execute('''
+        SELECT u.id, u.username, u.bio 
+        FROM users u
+        WHERE u.id != ?
+          AND NOT EXISTS (
+              SELECT 1 FROM follows f
+              WHERE f.follower_id = ? AND f.followed_id = u.id
+          )
+    ''', user_id, user_id)
+
+    return render_template("explore.html", users=users)

@@ -1,0 +1,76 @@
+{% extends "layout.html" %}
+
+{% block title %}Feed{% endblock %}
+
+{% block main %}
+<div class="container mt-5">
+    <h3 class="mb-4 text-center">Your Feed</h3>
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+
+            {% if posts %}
+                {% for post in posts %}
+                    <div class="card mb-4 shadow-lg border-light">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h5 class="card-title mb-0">
+                                    <a href="{{ url_for('profile', username=post['username']) }}" class="text-dark text-decoration-none">
+                                        {{ post['username'] }}
+                                    </a>
+                                </h5>
+                                <small class="text-muted">{{ post['created_at'] }}</small>
+                            </div>
+                            <p class="card-text">{{ post['content'] }}</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <form action="{{ url_for('toggle_like', post_id=post['id']) }}" method="post" class="d-inline">
+                                        <button type="submit" class="btn {{ 'btn-primary' if post['liked_by_user'] else 'btn-outline-primary' }} btn-sm">
+                                            <i class="bi bi-heart-fill"></i> {{ post['like_count'] }}
+                                        </button>
+                                    </form>
+                                    <button class="btn btn-outline-secondary btn-sm" data-bs-toggle="collapse" data-bs-target="#comments-{{ post['id'] }}">
+                                        <i class="bi bi-chat-fill"></i> {{ comments[post['id']] | length if post['id'] in comments else 0 }}
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="collapse mt-3" id="comments-{{ post['id'] }}">
+                                <div class="card card-body bg-light">
+                                    {% if post['id'] in comments %}
+                                        {% for comment in comments[post['id']] %}
+                                            <div class="d-flex mb-3">
+                                                <div class="flex-shrink-0">
+                                                    <img src="{{ url_for('static', filename='default-avatar.png') }}" alt="Avatar" class="rounded-circle" width="40" height="40">
+                                                </div>
+                                                <div class="flex-grow-1 ms-3">
+                                                    <h6 class="mb-0">{{ comment['username'] }}</h6>
+                                                    <small class="text-muted">{{ comment['created_at'] }}</small>
+                                                    <p class="mb-1">{{ comment['content'] }}</p>
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    {% else %}
+                                        <p class="text-muted mb-1">No comments yet. Be the first to comment!</p>
+                                    {% endif %}
+                                    <form action="{{ url_for('add_comment', post_id=post['id']) }}" method="post" class="d-flex mt-3">
+                                        <input type="text" name="content" class="form-control form-control-sm me-2" placeholder="Add a comment..." required>
+                                        <button type="submit" class="btn btn-primary btn-sm">Comment</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <!-- Message when there are no posts -->
+                <div class="card mb-4 shadow-lg border-light">
+                    <div class="card-body text-center">
+                        <h5 class="card-title mb-3">No Posts Available</h5>
+                        <p class="card-text text-muted">It seems your feed is empty. Start following people to see their posts here!</p>
+                        <a href="{{ url_for('explore') }}" class="btn btn-primary">Explore Users</a>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
