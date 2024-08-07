@@ -1,0 +1,23 @@
+{% extends "layout.html" %}
+
+{% block title %}Create Post{% endblock %}
+
+{% block main %}
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card shadow-lg border-light">
+                    <div class="card-body">
+                        <h3 class="card-title text-center mb-4">Create a New Post</h3>
+                        <form action="{{ url_for('create_post') }}" method="POST">
+                            <div class="mb-3">
+                                <textarea class="form-control" name="content" rows="4" placeholder="What's on your mind?" maxlength="500" required></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100">Post</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

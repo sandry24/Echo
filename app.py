@@ -143,7 +143,8 @@ def edit_profile():
             return apology("Username already exists", 400)
 
         if len(bio) > 500:
-            return apology("Bio cannot exceed 500 characters", 400)
+            flash("Bio cannot exceed 500 characters!", "danger")
+            return redirect(url_for("edit_profile"))
 
         password_hash = generate_password_hash(password) if password else user["password_hash"]
         db.execute(
@@ -363,4 +364,32 @@ def send_message(conversation_id):
     db.execute('INSERT INTO messages (conversation_id, sender_id, content) VALUES (?, ?, ?)',
                conversation_id, user_id, content)
     return redirect(url_for('conversation', conversation_id=conversation_id))
+
+
+@app.route("/create-post", methods=["GET", "POST"])
+@login_required
+def create_post():
+    """Allow user to create a new post"""
+    if request.method == "POST":
+        content = request.form.get("content")
+
+        if not content:
+            flash("Content cannot be empty!", "danger")
+            return redirect(url_for("create_post"))
+
+        if len(content) > 500:
+            flash("Text cannot exceed 500 characters!", "danger")
+            return redirect(url_for("create_post"))
+
+        # Insert the new post into the database
+        db.execute(
+            "INSERT INTO posts (user_id, content) VALUES (?, ?)",
+            session["user_id"],
+            content
+        )
+
+        flash("Post created successfully!", "success")
+        return redirect(url_for("feed"))  # Redirect to a feed page or another route
+
+    return render_template("create_post.html")
 
