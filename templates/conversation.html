@@ -57,7 +57,7 @@
                     <div class="card-footer bg-light border-top-0">
                         <form action="{{ url_for('send_message', conversation_id=conversation_id) }}" method="post">
                             <div class="input-group">
-                                <input type="text" name="content" autocomplete="off" class="form-control" placeholder="Type a message..." aria-label="Type a message..." aria-describedby="button-addon2" required>
+                                <input type="text" name="content" autocomplete="off" autofocus class="form-control" placeholder="Type a message..." aria-label="Type a message..." aria-describedby="button-addon2" required>
                                 <button class="btn btn-primary" type="submit" id="button-addon2">Send</button>
                             </div>
                         </form>
