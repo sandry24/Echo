@@ -432,7 +432,7 @@ def feed():
         FROM comments c
         JOIN users u ON c.user_id = u.id
         WHERE c.post_id IN (SELECT id FROM posts)
-        ORDER BY c.created_at ASC
+        ORDER BY c.created_at
     ''')
 
     grouped_comments = {}
@@ -569,4 +569,3 @@ def following(user_id):
     """, user_id)
 
     return render_template("following.html", users=following_list, is_followed=is_followed)
-
